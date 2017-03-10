@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+		<link rel="stylesheet" type="text/css" href="/static/main.css" />
+		
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script src="https://apis.google.com/js/client:platform.js?onload=start"></script>
+		<title>Catalog</title>
+	</head>
+
+	<body>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container-fluid">
+				<div class="row">
+					<ul class="nav navbar-nav">
+					<!-- {% if not user %}
+						<li {{home_status}}><a href="/">Home</a></li>
+						<li {{signup_status}}><a href="/signup">Signup</a></li>
+						<li {{login_status}}><a href="/login">Login</a></li>
+					{% else %}
+						<li {{home_status}}><a href="/">Home</a></li>
+						<li {{newpost_status}}><a href="/newpost">New Post</a></li>
+						<li><a href="/logout">Logout</a></li>
+					{% endif %} -->
+					</ul>
+				</div>	
+			</div>
+		</nav>
+		<br>
+		<br>
+		<br>
+		{% block content %}
+		{% endblock %}
+	</body>
+</html>
