@@ -79,29 +79,37 @@ function signInCallback(authResult) {
 
 
 <!-- FACEBOOK SIGN IN -->
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.8&appId=391439314565376";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 <script type="text/javascript">
-  window.fbAsyncInt = function() {
-    FB.init({
-      appId     : '391439314565376',// enable cookies to allow the server to access the session
-      cookie    : true,             //parse social plugins on this page
-      xfbml     : true,             //use version 2.2
-      version   : 'v2.8'
-    });
-  };
+  // window.fbAsyncInt = function() {
+  //   FB.init({
+  //     appId     : '391439314565376',// enable cookies to allow the server to access the session
+  //     cookie    : true,             //parse social plugins on this page
+  //     xfbml     : true,             //use version 2.2
+  //     version   : 'v2.8'
+  //   });
+  // };
 
-  // Load the SDK asynchronously
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
+  // // Load the SDK asynchronously
+  // (function(d, s, id) {
+  //   var js, fjs = d.getElementsByTagName(s)[0];
+  //   if (d.getElementById(id)) return;
+  //   js = d.createElement(s); js.id = id;
+  //   js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=2.8&appId=391439314565376";
+  //   fjs.parentNode.insertBefore(js, fjs);
+  // }(document, 'script', 'facebook-jssdk'));
 
 
   // Here we run a very simple test of the Graph API after login is
   // successful.  See statusChangeCallback() for when this call is made.
-  function sendTokenToServer() {
+  function sendTokenToServer(response) {
     var access_token = FB.getAuthResponse()['accessToken'];
     console.log(access_token)
     console.log('Welcome!  Fetching your information.... ');
@@ -131,11 +139,13 @@ function signInCallback(authResult) {
   }
 </script>
 
-<button>
+<!-- <button>
   <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
     <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
   </fb:login-button>
-</button>
+</button> -->
+
+<div class="fb-login-button" data-max-rows="1" data-size="xlarge" data-show-faces="false" data-auto-logout-link="true" onlogin="sendTokenToServer();"></div>
 <!--END FACEBOOK SIGN IN -->  
 
   </body>

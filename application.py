@@ -258,7 +258,7 @@ def gdisconnect():
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
 	if request.args.get('state') != login_session['state']:
-		request = make_response(json.dumps('Invalid state parameter.'), 401)
+		response = make_response(json.dumps('Invalid state parameter.'), 401)
 		response.headers['Content-Type'] = 'application/json'
 		return response
 	access_token = request.data
@@ -277,7 +277,7 @@ def fbconnect():
 	# Strip expire tag from access token
 	token = result.split('&')[0]
 
-	url =  "https://graph.facebook.com/v2.8/me?5s&fields=name,id,email" % token
+	url =  "https://graph.facebook.com/v2.8/me?%s&fields=name,id,email" % token
 	h = httplib2.Http()
 	result = h.request(url, 'GET')[1]
 	#print "url sent from API access: %s" % url
@@ -301,7 +301,8 @@ def fbconnect():
 	login_session['picture'] = data["data"]['url']
 
 	# see if user exists
-	user_id = getUserId(login_session)['email']
+	print(login_session['email'])
+	user_id = getUserId(login_session['email'])
 	if not user_id:
 		user_id = createUser(login_session)
 	login_session['user_id'] = user_id
@@ -320,7 +321,6 @@ def fbconnect():
 
 @app.route('/fbdisconnect')	
 def fbdisconnect():
-	del login_session['facebook_id' ]  
 	del login_session['username']   
 	del login_session['email'] 
 	del login_session['picture']
@@ -349,8 +349,13 @@ def getUserInfo(user_id):
 
 def getUserId(email):
 	try:
-		user = session.query(User).filter_by(email=email).one()
-		return user.id
+		if session.query(User).filter_by(email=email).one():
+			print ('in if')
+			user = session.query(User).filter_by(email=email).one()
+			return user.id
+		else:
+			print ("in else")
+			return None
 	except:
 		return None
 
