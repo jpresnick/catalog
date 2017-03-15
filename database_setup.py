@@ -40,7 +40,8 @@ class Item(Base):
 		return{
 			'id' : self.id,
 			'name' : self.name,
-			'description' : self.description
+			'description' : self.description,
+			'last_updated' : self.last_updated
 		}
 
 engine = create_engine('sqlite:///catalog.db')

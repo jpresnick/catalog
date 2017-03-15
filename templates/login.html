@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
-   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
-  </script>
-
-<script src="//apis.google.com/js/platform.js?onload=start"> </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+    <link rel="stylesheet" type="text/css" href="/static/main.css" />
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/client:platform.js?onload=start"></script>
+    <title>Catalog</title>
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+   <script src="//apis.google.com/js/platform.js?onload=start"> </script>
 
 <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
 
@@ -15,137 +19,159 @@
 
 
 <body>  
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-  <ul>
-  {% for message in messages %}
-    <li> <strong> {{ message }} </strong></li>
-  {% endfor %}
-  </ul>
-  {% endif %}
-{% endwith %}
+  <div class="container" id='navigation'>
+      <div class="row navigation">
+        {% if not login_session['user_id'] %}
+          <div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-3 col-sm-offset-3 col-md-offset-3 col-lg-offset-3 nav-element'><a href="/" class='nav-link {{home_status}}'>Home</a></div>
+          <div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-4 col-sm-offset-4 col-md-offset-4 col-lg-offset-4 nav-element login'><a href="/catalog/login" class='nav-link {{login_status}}'>Login</a></div>
+        {% else %}
+          <div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2 nav-element'><a href="/" class='nav-link-2 {{home_status}}'>Home</a></div>
+          <div class='col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2 nav-element'><a href="/catalog/new" class='nav-link-2 {{new_status}}'>Create A New Item</a></div>
+          <div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 nav-element login'><a href="/disconnect" class='nav-link-2 {{login_status}}'>Logout</a></div>
+        {% endif %}
+      </div>  
+    </div>
+    <br>
+  <div class='container'>
+    <div class='row '>
+      <div class='center'>
+        <H1>Log in with Facebook or Google: </H1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class='list-unstyled'>
+          {% for message in messages %}
+            <li> <strong> {{ message }} </strong></li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+        {% endwith %}
+        <br>
+      </div>
+      <div class='signin'>
+        <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();" data-size="xlarge" "fb-login-button">
+          <div class="fb-login-button" data-max-rows="1" data-show-faces="false" onlogin="sendTokenToServer();"></div>
+        </fb:login-button>
+      </div>
+      <br>
+      <div id="signInButton" class='signin'>
+        <span class="g-signin"
+          data-scope="openid email"
+          data-clientid="175408124905-01ts2qr04d4g7g25bkvl3l3jqk5nni34.apps.googleusercontent.com"
+          data-redirecturi="postmessage"
+          data-accesstype="offline"
+          data-cookiepolicy="single_host_origin"
+          data-callback="signInCallback"
+          data-approvalprompt="force">
+        </span>
 
 
-<!-- GOOGLE PLUS SIGN IN-->
+        <!-- GOOGLE PLUS SIGN IN-->
+        <div id="result"></div>
 
-          
-          <div id="signInButton">
-          <span class="g-signin"
-            data-scope="openid email"
-            data-clientid="175408124905-01ts2qr04d4g7g25bkvl3l3jqk5nni34.apps.googleusercontent.com"
-            data-redirecturi="postmessage"
-            data-accesstype="offline"
-            data-cookiepolicy="single_host_origin"
-            data-callback="signInCallback"
-            data-approvalprompt="force">
-          </span>
-        </div>
-
-<div id="result"></div>
-
-<script>
-function signInCallback(authResult) {
-  if (authResult['code']) {
-    // Hide the sign-in button now that the user is authorized
-    $('#signinButton').attr('style', 'display: none');
-    // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
-    $.ajax({
-      type: 'POST',
-      url: '/gconnect?state={{STATE}}',
-      processData: false,
-      data: authResult['code'],
-      contentType: 'application/octet-stream; charset=utf-8',
-      success: function(result) {
-        // Handle or verify the server response if necessary.
-        if (result) {
-          $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
-         setTimeout(function() {
-          window.location.href = "/catalog";
-         }, 4000);
-          
-      } else if (authResult['error']) {
-    console.log('There was an error: ' + authResult['error']);
-  } else {
-        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
-         }
-      }
-      
-  }); } }
-</script>
+        <script>
+        function signInCallback(authResult) {
+          if (authResult['code']) {
+            // Hide the sign-in button now that the user is authorized
+            $('#signinButton').attr('style', 'display: none');
+            // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+            $.ajax({
+              type: 'POST',
+              url: '/gconnect?state={{STATE}}',
+              processData: false,
+              data: authResult['code'],
+              contentType: 'application/octet-stream; charset=utf-8',
+              success: function(result) {
+                // Handle or verify the server response if necessary.
+                if (result) {
+                  $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                 setTimeout(function() {
+                  window.location.href = "/catalog";
+                 }, 4000);
+                  
+              } else if (authResult['error']) {
+            console.log('There was an error: ' + authResult['error']);
+          } else {
+                $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                 }
+              }
+              
+          }); } }
+        </script>
 
 
 
-<!--END GOOGLE PLUS SIGN IN -->
+        <!--END GOOGLE PLUS SIGN IN -->
 
 
-<!-- FACEBOOK SIGN IN -->
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.8&appId=391439314565376";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-<script type="text/javascript">
-  // window.fbAsyncInt = function() {
-  //   FB.init({
-  //     appId     : '391439314565376',// enable cookies to allow the server to access the session
-  //     cookie    : true,             //parse social plugins on this page
-  //     xfbml     : true,             //use version 2.2
-  //     version   : 'v2.8'
-  //   });
-  // };
+        <!-- FACEBOOK SIGN IN -->
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.8&appId=391439314565376";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+        <script type="text/javascript">
+          // window.fbAsyncInt = function() {
+          //   FB.init({
+          //     appId     : '391439314565376',// enable cookies to allow the server to access the session
+          //     cookie    : true,             //parse social plugins on this page
+          //     xfbml     : true,             //use version 2.2
+          //     version   : 'v2.8'
+          //   });
+          // };
 
-  // // Load the SDK asynchronously
-  // (function(d, s, id) {
-  //   var js, fjs = d.getElementsByTagName(s)[0];
-  //   if (d.getElementById(id)) return;
-  //   js = d.createElement(s); js.id = id;
-  //   js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=2.8&appId=391439314565376";
-  //   fjs.parentNode.insertBefore(js, fjs);
-  // }(document, 'script', 'facebook-jssdk'));
+          // // Load the SDK asynchronously
+          // (function(d, s, id) {
+          //   var js, fjs = d.getElementsByTagName(s)[0];
+          //   if (d.getElementById(id)) return;
+          //   js = d.createElement(s); js.id = id;
+          //   js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=2.8&appId=391439314565376";
+          //   fjs.parentNode.insertBefore(js, fjs);
+          // }(document, 'script', 'facebook-jssdk'));
 
 
-  // Here we run a very simple test of the Graph API after login is
-  // successful.  See statusChangeCallback() for when this call is made.
-  function sendTokenToServer(response) {
-    var access_token = FB.getAuthResponse()['accessToken'];
-    console.log(access_token)
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);
-      $.ajax({
-        type: 'POST',
-        url: '/fbconnect?state={{STATE}}',
-        processData: false,
-        data: access_token,
-        contentType: 'application/octet-stream; charset=utf-8',
-        success: function(result) {
-          // Handle or verify the server response if necessary.
-          if (result) {
-            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
-           setTimeout(function() {
-            window.location.href = "/catalog";
-           }, 4000);
-            
-          } 
-          else {
-          $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+          // Here we run a very simple test of the Graph API after login is
+          // successful.  See statusChangeCallback() for when this call is made.
+          function sendTokenToServer(response) {
+            var access_token = FB.getAuthResponse()['accessToken'];
+            console.log(access_token)
+            console.log('Welcome!  Fetching your information.... ');
+            FB.api('/me', function(response) {
+              console.log('Successful login for: ' + response.name);
+              $.ajax({
+                type: 'POST',
+                url: '/fbconnect?state={{STATE}}',
+                processData: false,
+                data: access_token,
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function(result) {
+                  // Handle or verify the server response if necessary.
+                  if (result) {
+                    $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                   setTimeout(function() {
+                    window.location.href = "/catalog";
+                   }, 4000);
+                    
+                  } 
+                  else {
+                  $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                  }
+                }
+              });
+            });
           }
-        }
-      });
-    });
-  }
-</script>
+        </script>
+      </div>
+    </div>
+  </div>
 
 <!-- <button>
   <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
     <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
   </fb:login-button>
 </button> -->
-
-<div class="fb-login-button" data-max-rows="1" data-size="xlarge" data-show-faces="false" data-auto-logout-link="true" onlogin="sendTokenToServer();"></div>
 <!--END FACEBOOK SIGN IN -->  
 
   </body>

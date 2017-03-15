@@ -2,30 +2,41 @@
 {% block content %}
 	<div class="container">
 		<div class="row">
-			{% with messages = get_flashed_messages() %}
-				{% if messages %}
-					<ul>
-					{% for message in messages %}
-						<li> <strong> {{ message }} </strong></li>
-					{% endfor %}
-					</ul>
-				{% endif %}
-			{% endwith %}
-			<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-md-offset-3 col-lg-offset-3">
-				<a href="{{ url_for('login') }}">login</a>
-				<a href="{{ url_for('disconnect') }}">logout</a>
-				<h3>Categories</h3>
-				{% for category in categories %}
-				<a href="{{ url_for('catalogCategory', category_id=category.id) }}">{{ category.name }} {{ category.id }}</a>
-				<br>
-				{% endfor %}
+			<div class='center'>
+				{% with messages = get_flashed_messages() %}
+					{% if messages %}
+						<ul class='list-unstyled'>
+						{% for message in messages %}
+							<li> <strong> {{ message }} </strong></li>
+						{% endfor %}
+						</ul>
+					{% endif %}
+				{% endwith %}
 			</div>
-			<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-				<h3>Recently Added</h3>
-				{% for item in recent_items %}
-					<a href="{{ url_for('catalogItem', category_id=item.category_id, item_id=item.id) }}">{{ item.name }} {{ item.id }}</a>
-					<br>
-				{% endfor %}
+			<div class='row'>
+				<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2 categories">
+					<h1>Categories</h1>
+					<div>
+						{% for category in categories %}
+							<a href="{{ url_for('catalogCategory', category_id=category.id) }}">{{ category.name }}</a>
+							<br>
+						{% endfor %}
+					</div>
+				</div>
+				<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 recently-added">
+					<h1>Recently Added</h1>
+					<div class='main-list'>
+						{% for item in recent_items %}
+							<a href="{{ url_for('catalogItem', category_id=item.category_id, item_id=item.id) }}" class='main-link'>{{ item.name }}</a>
+							{% for category in categories %}
+								{% if category.id == item.category_id %}
+									({{ category.name }})
+									<br>
+								{% endif %}
+							{% endfor %}
+						{% endfor %}
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

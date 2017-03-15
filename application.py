@@ -18,20 +18,37 @@ session = DBSession()
 CLIENT_ID = json.loads(
 	open('client_secrets.json', 'r').read())['web']['client_id']
 
+active = 'active'
+
+# Make an API endpoint for individual items
+@app.route('/catalog/<int:item_id>/item/JSON')
+def itemJSON(item_id):
+	item = session.query(Item).filter_by(id=item_id).one()
+	return jsonify(Item=item.serialize)
+
+# Make an API endpoint for all items in a category
+@app.route('/catalog/<int:category_id>/category/JSON')
+def categoryJSON(category_id):
+	category = session.query(Category).filter_by(id=category_id).one()
+	items = session.query(Item).filter_by(category_id=category_id).all()
+	return jsonify(Item=[i.serialize for i in items])
+
+
 
 @app.route('/')
 @app.route('/catalog/')
 def catalog():
 	categories = session.query(Category).all()
 	recent_items = session.query(Item).order_by(Item.last_updated.desc()).limit(11).all()
-	return render_template('catalog.html', categories=categories, recent_items=recent_items)
+	home_status = 'class=active'
+	return render_template('catalog.html', categories=categories, recent_items=recent_items, login_session=login_session, home_status=active)
 
 
 @app.route('/catalog/<int:category_id>/')
 def catalogCategory(category_id):
 	category = session.query(Category).filter_by(id=category_id).one()
 	items = session.query(Item).filter_by(category_id=category_id).all()
-	return render_template('category.html', category = category, items = items)
+	return render_template('category.html', category = category, items = items, login_session=login_session)
 
 
 @app.route('/catalog/<int:category_id>/<int:item_id>/')
@@ -39,20 +56,19 @@ def catalogItem(category_id, item_id):
 	item = session.query(Item).filter_by(id = item_id).one()
 	if 'user_id' in login_session:
 		user_id = login_session['user_id']
-		item_user_id = session.query(Item).filter_by(id=item_id).one().user_id
-		if user_id != item_user_id:
-			return render_template('itemPublic.html', item=item)
+		if user_id != item.user_id:
+			return render_template('itemPublic.html', item=item, login_session=login_session)
 		else: 
-			return render_template('item.html', item=item, category_id=category_id)
+			return render_template('item.html', item=item, category_id=category_id, login_session=login_session)
 	else:
-		return render_template('itemPublic.html', item=item)
+		return render_template('itemPublic.html', item=item, login_session=login_session)
 
 
 @app.route('/catalog/login/')
 def login():
 	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
 	login_session['state'] = state
-	return render_template('login.html', STATE=state)
+	return render_template('login.html', STATE=state, login_session=login_session, login_status=active)
 
 
 @app.route('/catalog/new/', methods=['GET','POST'])
@@ -74,7 +90,7 @@ def newItem():
 		flash("new item added")
 		return redirect(url_for('catalog'))
 	else:
-		return render_template('newItem.html')
+		return render_template('newItem.html', login_session=login_session, new_status=active)
 
 
 @app.route('/catalog/<int:category_id>/<int:item_id>/edit/', methods=['GET','POST'])
@@ -104,7 +120,7 @@ def editItem(item_id, category_id):
 			return redirect(url_for('catalogItem', item_id=item_id, category_id=item.category_id))
 		else:
 			category = session.query(Category).filter_by(id=item.category_id).one()
-			return render_template('editItem.html', item=item, category=category)
+			return render_template('editItem.html', item=item, category=category, login_session=login_session)
 
 
 @app.route('/catalog/<int:category_id>/<int:item_id>/delete/', methods=['GET','POST'])
@@ -124,7 +140,7 @@ def deleteItem(category_id, item_id):
 	else:
 		item = session.query(Item).filter_by(id=item_id).one()
 		category = session.query(Category).filter_by(id=item.category_id).one()
-		return render_template('confirmDelete.html', item=item, category=category)
+		return render_template('confirmDelete.html', item=item, category=category, login_session=login_session)
 
 
 @app.route('/disconnect')
@@ -132,7 +148,7 @@ def disconnect():
 	if 'provider' in login_session:
 		if login_session['provider'] == 'google':
 			gdisconnect()
-		if login_session['provider'] == 'facebook':
+		elif login_session['provider'] == 'facebook':
 			fbdisconnect()
 
 		flash ("You have successfully been logged out.")
@@ -225,7 +241,7 @@ def gconnect():
 	output += '<img src="'
 	output += login_session['picture']
 	output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-	flash("you are now logged in as %s" % login_session['username'])
+	flash("You are now logged in as %s" % login_session['username'])
 	print "done!"
 	return output
 
@@ -246,6 +262,8 @@ def gdisconnect():
 	result = h.request(url, 'GET')[0]
 	if result['status'] != '200':
 		# For whatever reason, the given token was invalid.
+		del login_session['provider']
+		del login_session['user_id']
 		del login_session['credentials']       
 		del login_session['gplus_id']     
 		del login_session['username']
@@ -272,8 +290,6 @@ def fbconnect():
 	h = httplib2.Http()
 	result = h.request(url, 'GET')[1]
 
-	# Use token to get user info from API
-	userinfo_url = "https://graph.facebook.com/v2.8/me"
 	# Strip expire tag from access token
 	token = result.split('&')[0]
 
@@ -285,8 +301,11 @@ def fbconnect():
 	data = json.loads(result)
 	login_session['provider'] = 'facebook'
 	login_session['username'] = data['name']
-	login_session['email'] = data['email']
 	login_session['facebook_id'] = data['id']
+	if data['email']:
+		login_session['email'] = data['email']
+	else:
+		login_session['email'] = data['']
 
 	# The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
 	stored_token = token.split('=')[1]
@@ -314,7 +333,7 @@ def fbconnect():
 	output += '<img src="'
 	output += login_session['picture']
 	output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-	flash("you are now logged in as %s" % login_session['username'])
+	flash("You are now logged in as %s" % login_session['username'])
 	print "done!"
 	return output
 

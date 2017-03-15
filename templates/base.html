@@ -13,25 +13,18 @@
 	</head>
 
 	<body>
-		<nav class="navbar navbar-inverse navbar-fixed-top">
-			<div class="container-fluid">
-				<div class="row">
-					<ul class="nav navbar-nav">
-					<!-- {% if not user %}
-						<li {{home_status}}><a href="/">Home</a></li>
-						<li {{signup_status}}><a href="/signup">Signup</a></li>
-						<li {{login_status}}><a href="/login">Login</a></li>
-					{% else %}
-						<li {{home_status}}><a href="/">Home</a></li>
-						<li {{newpost_status}}><a href="/newpost">New Post</a></li>
-						<li><a href="/logout">Logout</a></li>
-					{% endif %} -->
-					</ul>
-				</div>	
-			</div>
-		</nav>
-		<br>
-		<br>
+		<div class="container" id='navigation'>
+			<div class="row navigation">
+				{% if not login_session['user_id'] %}
+					<div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-3 col-sm-offset-3 col-md-offset-3 col-lg-offset-3 nav-element'><a href="/" class='nav-link {{home_status}}'>Home</a></div>
+          			<div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-4 col-sm-offset-4 col-md-offset-4 col-lg-offset-4 nav-element login'><a href="/catalog/login" class='nav-link {{login_status}}'>Login</a></div>
+				{% else %}
+					<div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2 nav-element'><a href="/" class='nav-link-2 {{home_status}}'>Home</a></div>
+					<div class='col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2 nav-element'><a href="/catalog/new" class='nav-link-2 {{new_status}}'>Create A New Item</a></div>
+					<div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 nav-element login'><a href="/disconnect" class='nav-link-2 {{login_status}}'>Logout</a></div>
+				{% endif %}
+			</div>	
+		</div>
 		<br>
 		{% block content %}
 		{% endblock %}
