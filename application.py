@@ -6,6 +6,7 @@ from database_setup import Base, Category, Item, User
 import random, string, httplib2, json, requests
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
+from functools import wraps
 
 app = Flask(__name__)
 
@@ -19,6 +20,18 @@ CLIENT_ID = json.loads(
 	open('client_secrets.json', 'r').read())['web']['client_id']
 
 active = 'active'
+
+
+def login_required(f):
+	@wraps(f)
+	def decorated_function(*args, **kwargs):
+		if 'username' in login_session:
+			return f(*args, **kwargs)
+		else:
+			flash("You must be logged in to access that page.")
+			return redirect(url_for('login'))
+	return decorated_function
+
 
 # Make an API endpoint for individual items
 @app.route('/catalog/<int:item_id>/item/JSON')
@@ -72,10 +85,8 @@ def login():
 
 
 @app.route('/catalog/new/', methods=['GET','POST'])
+@login_required
 def newItem():
-	if 'username' not in login_session:
-		flash("You must be logged in to create a new item.")
-		return redirect(url_for('login'))
 	if request.method == 'POST':
 		if request.form['submit'] == 'Cancel':
 			return redirect(url_for('catalog'))
@@ -94,10 +105,8 @@ def newItem():
 
 
 @app.route('/catalog/<int:category_id>/<int:item_id>/edit/', methods=['GET','POST'])
+@login_required
 def editItem(item_id, category_id):
-	if 'username' not in login_session:
-		flash("You must be logged in to edit an item.")
-		return redirect(url_for('login'))
 	if request.method == 'POST':
 		update = session.query(Item).filter_by(id = item_id).one()
 		if request.form['submit'] == 'Cancel':
@@ -124,10 +133,8 @@ def editItem(item_id, category_id):
 
 
 @app.route('/catalog/<int:category_id>/<int:item_id>/delete/', methods=['GET','POST'])
+@login_required
 def deleteItem(category_id, item_id):
-	if 'username' not in login_session:
-		flash("You must be logged in to delete an new item.")
-		return redirect(url_for('login'))
 	if request.method == 'POST':
 		delete = session.query(Item).filter_by(id = item_id).one()
 		if request.form['submit'] == 'Cancel':
