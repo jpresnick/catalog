@@ -60,19 +60,21 @@ def catalog():
 	recent_items = session.query(Item).\
 		order_by(Item.last_updated.desc()).limit(11).all()
 	home_status = 'class=active'
-	return render_template('catalog.html', categories=categories, 
-											recent_items=recent_items, 
-											login_session=login_session, 
-											home_status=active)
+	return render_template('catalog.html', 
+							categories=categories, 
+							recent_items=recent_items, 
+							login_session=login_session, 
+							home_status=active)
 
 
 @app.route('/catalog/<int:category_id>/')
 def catalogCategory(category_id):
 	category = session.query(Category).filter_by(id=category_id).one()
 	items = session.query(Item).filter_by(category_id=category_id).all()
-	return render_template('category.html', category=category, 
-											items=items, 
-											login_session=login_session)
+	return render_template('category.html', 
+							category=category, 
+							items=items, 
+							login_session=login_session)
 
 
 @app.route('/catalog/<int:category_id>/<int:item_id>/')
@@ -81,15 +83,18 @@ def catalogItem(category_id, item_id):
 	if 'user_id' in login_session:
 		user_id = login_session['user_id']
 		if user_id != item.user_id:
-			return render_template('itemPublic.html', item=item, 
-														login_session=login_session)
+			return render_template('itemPublic.html', 
+									item=item, 
+									login_session=login_session)
 		else: 
-			return render_template('item.html', item=item, 
-												category_id=category_id, 
-												login_session=login_session)
+			return render_template('item.html', 
+									item=item, 
+									category_id=category_id, 
+									login_session=login_session)
 	else:
-		return render_template('itemPublic.html', item=item, 
-													login_session=login_session)
+		return render_template('itemPublic.html', 
+								item=item, 
+								login_session=login_session)
 
 
 @app.route('/catalog/login/')
@@ -97,9 +102,10 @@ def login():
 	state = ''.join(random.choice(string.ascii_uppercase + string.digits) 
 		for x in xrange(32))
 	login_session['state'] = state
-	return render_template('login.html', STATE=state, l
-											ogin_session=login_session, 
-											login_status=active)
+	return render_template('login.html', 
+							STATE=state, 
+							login_session=login_session, 
+							login_status=active)
 
 
 @app.route('/catalog/new/', methods=['GET', 'POST'])
@@ -119,8 +125,9 @@ def newItem():
 		flash("new item added")
 		return redirect(url_for('catalog'))
 	else:
-		return render_template('newItem.html', login_session=login_session, 
-												new_status=active)
+		return render_template('newItem.html', 
+								login_session=login_session, 
+								new_status=active)
 
 
 @app.route('/catalog/<int:category_id>/<int:item_id>/edit/', methods=['GET', 'POST'])
@@ -128,32 +135,41 @@ def newItem():
 def editItem(item_id, category_id):
 	if request.method == 'POST':
 		update = session.query(Item).filter_by(id=item_id).one()
-		if request.form['submit'] == 'Cancel':
-			return redirect(url_for('catalogItem', category_id=category_id, 
-													item_id=item_id))
-		elif update != []:
-			category = request.form['category']
-			category_id = session.query(Category).filter_by(name=category).one().id
-			update.name = request.form['name']
-			update.category_id = category_id
-			update.description = request.form['description']
-			session.add(update)
-			session.commit()
-			flash("Your changes were saved")
-		return redirect(url_for('catalogItem', category_id=category_id, 
-												item_id=item_id))
+		if login_session['user_id'] != update.user_id:
+			flash("You must be the owner of this item to edit it.")
+			return redirect(url_for('catalogItem', 
+									item_id=item_id, 
+									category_id=update.category_id))
+		else:
+			if update.user_id == login_session['user_id']:
+				if request.form['submit'] == 'Cancel':
+					return redirect(url_for('catalogItem', 
+											category_id=category_id, 
+											item_id=item_id))
+				elif update != []:
+					category = request.form['category']
+					category_id = session.query(Category).filter_by(name=category).one().id
+					update.name = request.form['name']
+					update.category_id = category_id
+					update.description = request.form['description']
+					session.add(update)
+					session.commit()
+					flash("Your changes were saved")
+				return redirect(url_for('catalogItem', 
+										category_id=category_id, 
+										item_id=item_id))
+			else:
+				flash("You must be the creator to edit this item.")
+				return redirect(url_for('login'))
 	else:
 		user_id = login_session['user_id']
 		item = session.query(Item).filter_by(id=item_id).one()
-		if user_id != item.user_id:
-			flash("You must be the owner of this item to edit it.")
-			return redirect(url_for('catalogItem', item_id=item_id, 
-													category_id=item.category_id))
-		else:
-			category = session.query(Category).filter_by(id=item.category_id).one()
-			return render_template('editItem.html', item=item, 
-													category=category, 
-													login_session=login_session)
+		
+		category = session.query(Category).filter_by(id=item.category_id).one()
+		return render_template('editItem.html', 
+								item=item, 
+								category=category, 
+								login_session=login_session)
 
 
 @app.route('/catalog/<int:category_id>/<int:item_id>/delete/', methods=['GET', 'POST'])
@@ -161,20 +177,28 @@ def editItem(item_id, category_id):
 def deleteItem(category_id, item_id):
 	if request.method == 'POST':
 		delete = session.query(Item).filter_by(id=item_id).one()
-		if request.form['submit'] == 'Cancel':
-			return redirect(url_for('catalogItem', category_id=category_id, 
-													item_id=item_id))
-		elif delete != []:
-			session.delete(delete)
-			session.commit()
-			flash("Your Item Has Been Deleted")
-		return redirect(url_for('catalog'))
+		if login_session['user_id'] != delete.user_id:
+			flash("You must be the owner of this item to delete it.")
+			return redirect(url_for('catalogItem', 
+									item_id=item_id, 
+									category_id=delete.category_id))
+		else:											
+			if request.form['submit'] == 'Cancel':
+				return redirect(url_for('catalogItem', 
+										category_id=category_id, 
+										item_id=item_id))
+			elif delete != []:
+				session.delete(delete)
+				session.commit()
+				flash("Your Item Has Been Deleted")
+			return redirect(url_for('catalog'))
 	else:
 		item = session.query(Item).filter_by(id=item_id).one()
 		category = session.query(Category).filter_by(id=item.category_id).one()
-		return render_template('confirmDelete.html', item=item, 
-														category=category, 
-														login_session=login_session)
+		return render_template('confirmDelete.html', 
+								item=item, 
+								category=category, 
+								login_session=login_session)
 
 
 @app.route('/disconnect')
@@ -218,7 +242,7 @@ def gconnect():
 	url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
 		% access_token)
 	h = httplib2.Http()
-	result = json.loads(h.request(url, 'GET')[1])
+	result = json.loads(h.request(url, 'GET')[1].decode('utf8'))
 	# If there was an error in the access token info, abort.
 	if result.get('error') is not None:
 		response = make_response(json.dumps(result.get('error')), 500)
