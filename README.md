@@ -1,5 +1,5 @@
 # catalog
-This is my fourth project in Udacity's [Full Stack Web Development Nanodegree] (https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004).
+This is my fourth project in Udacity's [Full Stack Web Development Nanodegree](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004).
 
 ## Files
 ### - application.py 
@@ -19,7 +19,7 @@ Python file setting up the tables and relationships in my database, as well as a
 
 ## Requirements
 For Mac:
-This project requires that you have python dowloaded on your computer. I used Vagrant and [VirtualBox] (https://www.virtualbox.org) to run my program. Once you have your environment set up, create the database using the command: 
+This project requires that you have python dowloaded on your computer. I used Vagrant and [VirtualBox](https://www.virtualbox.org) to run my program. Once you have your environment set up, create the database using the command: 
 
 <code> python database_setup.py </code> 
 
