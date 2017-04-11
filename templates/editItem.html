@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class='container'>
+	<div class='row'>
+		<div class='col-xs-4 col-sm-4 col-md-4 col-lg-4 col-xs-offset-4 col-sm-offset-4 col-md-offset-4 col-lg-offset-4'>
+			<h1>Edit Item</h1>
+
+			<form action="{{ url_for('editItem', item_id = item.id, category_id=category.id) }}" method='post'>
+
+				<p>
+					Name:
+					<br>
+					<input type='text' size'30' name='name' value='{{ item.name }}'>
+				</p>
+				<p>
+					Category:
+					<br>
+					<select name="category" >
+						<option selected='selected'>{{ category.name }}</option>
+						<option value="Audi">Audi</option>
+						<option value="BMW">BMW</option>
+						<option value="Chevrolet">Chevrolet</option>
+						<option value="Ford">Ford</option>
+						<option value="Honda">Honda</option>
+						<option value="Jeep">Jeep</option>
+						<option value="Mazda">Mazda</option>
+						<option value="Nissan">Nissan</option>
+						<option value="Subaru">Subaru</option>
+						<option value="Tesla">Tesla</option>
+						<option value="Volvo">Volvo</option>
+					</select>
+				</p>
+				<p>
+					Description:
+					<textarea name='description' class='description-box'>{{ item.description }}</textarea>
+				</p>
+				<input type='submit' value='Save' name='submit'>
+				<input type='submit' value='Cancel' name='submit'>
+
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}	
+{% block content %}
+	<div class="container">
+		<div class="row">
+			<div class='col-xs-4 col-sm-4 col-md-4 col-lg-4 col-xs-offset-4 col-sm-offset-4 col-md-offset-4 col-lg-offset-4'>
+				<form action="{{ url_for('deleteItem', item_id = item.id, category_id=category.id) }}" method='post'>
+					<p>Are you sure you want to delete {{ item.name }} from the {{ category.name }} category?</p>
+					<input type='submit' value='Delete' name='submit'>
+					<input type='submit' value='Cancel' name='submit'>
+				</form>
+				
+			</div>
+		</div>
+	</div>
+{% endblock %}

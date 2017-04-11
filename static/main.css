@@ -1,0 +1,117 @@
+/**{
+    border: 1px solid red;
+}*/
+body {
+	background-color: #D7D6D6;
+}
+
+.description-box {
+	width: 350px;
+	height: 100px;
+}
+
+.signin {
+	text-align: center;
+}
+
+.fb-iframe-widget {
+	text-align: center;
+}
+
+.center {
+	text-align: center;
+}
+
+.nav-collapse .li {
+	list-style-type: none;
+}
+
+.navbar-nav {
+	margin-left: 260px;
+    display:table;
+    width: 800px;
+}
+
+.navbar-nav > li {
+    float: none;
+    display: table-cell;
+    width: 365px;
+}
+
+.home {
+	text-align: left;
+}
+
+.login {
+	text-align: right;
+}
+
+.new-item {
+	text-align: center;
+}
+
+.categories {
+	border: 1px solid black;
+	border-right: solid 1px #000;
+	padding-bottom: 10px;
+	background-color: white;
+}
+
+.recently-added {
+	padding 20px;
+	height: 301px;
+	border: 1px solid black;
+	border-left: none;
+	background-color: white;
+}
+
+.item {
+	background-color: white;
+	border: 1px solid black;
+}
+
+.main-list {
+	color: gray;
+}
+
+.item-title, .edit-delete {
+	text-align: center;
+}
+
+
+
+
+
+.nav-link {
+	color: gray;
+
+}
+
+.nav-link-2 {
+	color: gray;
+	font-size: 25px;
+
+}
+
+.active {
+	color: #E6E6E6;
+}
+
+#navigation.container{
+	background-color: black;
+	height: 50px;
+	width: 100%;
+}
+
+.nav-element {
+	font-size: 28px;
+	padding-top: 5px;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+a.nav-link:hover {
+	color: white;
+	text-decoration: none;
+}
+

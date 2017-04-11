@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+		<link rel="stylesheet" type="text/css" href="/static/main.css" />
+		
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script src="https://apis.google.com/js/client:platform.js?onload=start"></script>
+		<title>Catalog</title>
+	</head>
+
+	<body>
+		<div class="container" id='navigation'>
+			<div class="row navigation">
+				{% if not login_session['user_id'] %}
+					<div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-3 col-sm-offset-3 col-md-offset-3 col-lg-offset-3 nav-element'><a href="/" class='nav-link {{home_status}}'>Home</a></div>
+          			<div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-4 col-sm-offset-4 col-md-offset-4 col-lg-offset-4 nav-element login'><a href="/catalog/login" class='nav-link {{login_status}}'>Login</a></div>
+				{% else %}
+					<div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2 nav-element'><a href="/" class='nav-link-2 {{home_status}}'>Home</a></div>
+					<div class='col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2 nav-element'><a href="/catalog/new" class='nav-link-2 {{new_status}}'>Create A New Item</a></div>
+					<div class='col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 nav-element login'><a href="/disconnect" class='nav-link-2 {{login_status}}'>Logout</a></div>
+				{% endif %}
+			</div>	
+		</div>
+		<br>
+		{% block content %}
+		{% endblock %}
+	</body>
+</html>
